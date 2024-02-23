@@ -10,20 +10,26 @@ const inputElem = document.getElementById('my-input');
 const listElem = document.getElementById('list');
 const errorMsg = document.getElementById('error-msg');
 const form = document.getElementsByTagName('form')[0];
+const category = document.getElementById('category')
 
 function updateCounter() {
   document.getElementById('count').innerText = notes.length;
 }
 
 function addNoteToModel() {
-  // ajouter la nouvelle note dans
-  notes.push(inputElem.value);
+  const noteText = inputElem.value;
+  const categoryValue = category.value;
+  console.log(categoryValue);
+  // Create a new Note object with text and category
+  const newNote = { text: noteText, category: categoryValue };
+  // Add the new note to the notes array
+  notes.push(newNote);
 }
 
 function addNoteToView() {
   // création de l'element d'affichage
   let newItem = document.createElement('li');
-  newItem.innerText = inputElem.value;
+  newItem.innerText = inputElem.value + "-" + category.value;
 
   // ajouter dans l'arbre / DOM
   // on l'ajoute comme enfant de la liste
@@ -69,10 +75,10 @@ form.addEventListener('submit', async function (event) {
   event.preventDefault();
   if (isValid()) {
     //instantiation d'une nouvelle note
-    const newNote = new Note(null, inputElem.value);
+    const newNote = new Note(null, inputElem.value, category.value);
     await NoteManager.create(newNote);
     await refreshNotes();
-    //updateCounter();
+    updateCounter();
     resetInput();
   }
 });
@@ -81,7 +87,8 @@ listElem.addEventListener('click', event => {
   console.log('event target: ', event.target.getAttribute("data-id"));
   const id = +event.target.getAttribute("data-id")
   if (!isNaN(id)) {
-    NoteManager.remove(id);
+    NoteManager.remove(id)
+    .then(() => refreshNotesOnDelete(id));//Refresh notes after deletion
   }
 })
 
@@ -96,3 +103,14 @@ async function refreshNotes() {
 }
 
 refreshNotes();
+
+async function refreshNotesOnDelete(id) {
+  notes = await NoteManager.list();
+  listElem.innerHTML = ''; // Clear the list before re-rendering
+  notes.forEach(note => {
+    const noteElem = NoteElement.create(note);
+    listElem.appendChild(noteElem);
+  });
+}
+
+refreshNotesOnDelete();
