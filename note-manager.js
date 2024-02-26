@@ -29,4 +29,16 @@ export class NoteManager {
             },           
         });
     }
+
+    static async update(id, updatedNote) {
+        const response = await fetch('http://localhost:3000/notes/' + id, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updatedNote)            
+        });
+        const data = await response.json();
+        return data;
+    }
 }

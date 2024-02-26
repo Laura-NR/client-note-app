@@ -28,9 +28,13 @@
       color: red;
       display: none;
     }
+
+    .hide{
+      display: none;
+    }
   </style>
 
-  <form>
+  <form id="myForm">
     <input type="text" id="my-input">
     <select name="category" id="category">
       <option value="Family">Family</option>
@@ -39,9 +43,14 @@
     </select>
     <div id="error-msg"><span>{{minChar}}</span> caractères minimum sont requis</div>
   </form>
-  <div>Nombre de notes : <span id="count">0</span></div>
-  <ol id="list">
-  </ol>
+
+  <div>Nombre de notes : <span id="count"></span></div>
+  
+  <br>
+  <label for="search">Search</label>
+  <input type="search" name="search" id="search">
+  
+  <ol id="list"></ol>
 
   <script async type="module" src="index.js">
   </script>
