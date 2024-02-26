@@ -21,7 +21,7 @@ function addNoteToModel() {
   const categoryValue = category.value;
   console.log(categoryValue);
   // Create a new Note object with text and category
-  const newNote = { text: noteText, category: categoryValue };
+  const newNote = { text: noteText, category: categoryValue};
   // Add the new note to the notes array
   notes.push(newNote);
 }
@@ -29,7 +29,10 @@ function addNoteToModel() {
 function addNoteToView() {
   // création de l'element d'affichage
   let newItem = document.createElement('li');
-  newItem.innerText = inputElem.value + "-" + category.value;
+  const noteText = inputElem.value;
+  const categoryValue = category.value;
+  const currentDate = new Date().toLocaleDateString(); // Get the current date
+  newItem.innerText = `${noteText} - ${categoryValue} - ${currentDate}`;
 
   // ajouter dans l'arbre / DOM
   // on l'ajoute comme enfant de la liste
@@ -85,7 +88,7 @@ form.addEventListener('submit', async function (event) {
 
 listElem.addEventListener('click', event => {
   console.log('event target: ', event.target.getAttribute("data-id"));
-  const id = +event.target.getAttribute("data-id")
+  const id = +event.target.getAttribute("data-id");
   if (!isNaN(id)) {
     NoteManager.remove(id)
     .then(() => refreshNotesOnDelete(id));//Refresh notes after deletion
