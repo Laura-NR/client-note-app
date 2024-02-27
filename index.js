@@ -100,7 +100,7 @@ listElem.addEventListener('click', event => {
   if (!isNaN(id)) {
     if (target.classList.contains('delete-btn')) {
       NoteManager.remove(id)
-        .then(() => refreshNotesOnDelete(id));
+        .then(() => refreshNotes());
     } else if (target.classList.contains('update-btn')) {
       // Assuming you have a function to get the updated note from the user
       console.log("Ahora si");
@@ -124,15 +124,6 @@ async function refreshNotes() {
 }
 
 refreshNotes();
-
-async function refreshNotesOnDelete(id) {
-  notes = await NoteManager.list();
-  listElem.innerHTML = ''; // Clear the list before re-rendering
-  notes.forEach(note => {
-    const noteElem = NoteElement.create(note);
-    listElem.appendChild(noteElem);
-  });
-}
 
 function getUpdatedNote() {
   const noteText = inputElem.value;
