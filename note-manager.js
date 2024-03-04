@@ -4,7 +4,7 @@ export class NoteManager {
     static async list() {
         const response = await fetch('http://localhost:3000/notes/');
         const data = await response.json()
-        console.log(data);
+        console.log("Chargement: ",data);
         return data.map(obj => new Note(obj.id, obj.text, obj.category, obj.date));
     }
 
@@ -30,13 +30,13 @@ export class NoteManager {
         });
     }
 
-    static async update(id, updatedNote) {
-        const response = await fetch('http://localhost:3000/notes/' + id, {
+    static async update(note) {
+        const response = await fetch('http://localhost:3000/notes/' + note.id, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(updatedNote)            
+            body: JSON.stringify(note)            
         });
         const data = await response.json();
         return data;

@@ -1,6 +1,6 @@
 import { Note } from './note.js';
 import { NoteManager } from './note-manager.js';
-import { NoteElement } from './note-element.js';
+import { NoteList } from './note-list.js';
 
 // le modèle
 let notes = [];
@@ -8,8 +8,8 @@ const minChars = 6;
 
 const inputElem = document.getElementById('my-input');
 const listElem = document.getElementById('list');
+
 const errorMsg = document.getElementById('error-msg');
-//const form = document.getElementsByTagName('form')[0];
 const form = document.getElementById('myForm');
 const category = document.getElementById('category');
 const counter = document.getElementById('count');
@@ -20,35 +20,6 @@ async function updateCounter() {
   counter.innerText = notes.length;
 }
 updateCounter();
-
-function addNoteToModel() {
-  const noteText = inputElem.value;
-  const categoryValue = category.value;
-  //const currentDate = new Date().toLocaleDateString();
-  console.log(categoryValue);
-  // Create a new Note object with text and category
-  const newNote = { text: noteText, category: categoryValue };
-  // Add the new note to the notes array
-  notes.push(newNote);
-}
-
-function addNoteToView() {
-  // création de l'element d'affichage
-  let newItem = document.createElement('li');
-  const noteText = inputElem.value;
-  const categoryValue = category.value;
-  const currentDate = new Date().toLocaleDateString(); // Get the current date
-  newItem.innerText = `${noteText} - ${categoryValue} - ${currentDate}`;
-
-  // ajouter dans l'arbre / DOM
-  // on l'ajoute comme enfant de la liste
-  listElem.appendChild(newItem);
-}
-
-function addNote() {
-  addNoteToModel();
-  addNoteToView();
-}
 
 function resetInput() {
   // reset du champs de saisie
@@ -93,23 +64,25 @@ form.addEventListener('submit', async function (event) {
   }
 });
 
-listElem.addEventListener('click', event => {
+listElem.addEventListener('click', async (event) => {
   console.log('event target: ', event.target.getAttribute("data-id"));
   const target = event.target;
   const id = +event.target.getAttribute("data-id");
   if (!isNaN(id)) {
     if (target.classList.contains('delete-btn')) {
-      NoteManager.remove(id)
-        .then(() => refreshNotes());
+      await NoteManager.remove(id);
     } else if (target.classList.contains('update-btn')) {
-      // Assuming you have a function to get the updated note from the user
-      console.log("Ahora si");
-      const updatedNote = getUpdatedNote(); // Implement this function
-      console.log(updatedNote);
-      NoteManager.update(id, updatedNote)
-        .then(() => refreshNotes());
-
+      //on filter sur les élements qui ont l'id correspondant
+      //on doit donc faire un [0] pour récupérer l'élement
+      const noteToUpdate = notes.filter(note => note.id === id)[0];
+      //on demande la saisi de la nouvelle valeur pour ce chemps
+      noteToUpdate.text = window.prompt('Nouvelle valeur pour le chemps text', noteToUpdate.text);
+      // const test = await NoteManager.update(noteToUpdate);
+      NoteManager.update(noteToUpdate)
+      .then(rersponse => refreshNotes())
+    
     }
+    refreshNotes();
   }
 })
 
@@ -117,20 +90,12 @@ document.querySelector('#error-msg span').innerText = minChars;
 
 async function refreshNotes() {
   notes = await NoteManager.list();
-  let noteElements = notes.map(note => NoteElement.create(note));
-  //while (listElem.children) listElem.removeChild(0);
+  let noteElements = notes.map(note => NoteList.create(note));
   listElem.innerHTML = '';
   noteElements.forEach(noteElem => listElem.appendChild(noteElem));
 }
 
 refreshNotes();
-
-function getUpdatedNote() {
-  const noteText = inputElem.value;
-  const categoryValue = category.value;
-  const currentDate = new Date().toLocaleDateString(); // Get the current date
-  return { text: noteText, category: categoryValue, date: currentDate };
-}
 
 searchInput.addEventListener('input', e => {
   const value = e.target.value.toLowerCase(); // Convert search value to lowercase for case-insensitive comparison
